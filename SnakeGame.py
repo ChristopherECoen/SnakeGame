@@ -6,7 +6,7 @@ from tkinter import messagebox
 
 class cube(object):
     rows = 20
-    w = 500
+    sL = 500
     def __init__(self,start,dirnx=1,dirny=0,color=(255,87,0)):
         self.pos = start
         self.dirnx = 1
@@ -20,7 +20,7 @@ class cube(object):
         self.pos = (self.pos[0] + self.dirnx, self.pos[1] + self.dirny)
 
     def draw(self, surface, eyes=False):
-        dis = self.w // self.rows
+        dis = self.sL // self.rows
         i = self.pos[0]
         j = self.pos[1]
 
@@ -123,8 +123,8 @@ class snake(object):
                 c.draw(surface)
 
 
-def drawGrid(w, rows, surface):
-    sizeBtwn = w // rows
+def drawGrid(sL, rows, surface):
+    sizeBtwn = sL // rows
 
     x = 0
     y = 0
@@ -132,16 +132,16 @@ def drawGrid(w, rows, surface):
         x = x + sizeBtwn
         y = y + sizeBtwn
 
-        pygame.draw.line(surface, (255,255,255), (x,0),(x,w))
-        pygame.draw.line(surface, (255,255,255), (0,y),(w,y))
+        pygame.draw.line(surface, (255,255,255), (x,0),(x,sL))
+        pygame.draw.line(surface, (255,255,255), (0,y),(sL,y))
         
 
 def redrawWindow(surface):
-    global rows, width, s, snack
+    global rows, sideLength, s, snack
     surface.fill((0,0,0))
     s.draw(surface)
     snack.draw(surface)
-    drawGrid(width,rows, surface)
+    drawGrid(sideLength,rows, surface)
     pygame.display.update()
 
 
@@ -172,10 +172,10 @@ def message_box(subject, content):
 
 
 def main():
-    global width, rows, s, snack
-    width = 500
+    global sideLength, rows, s, snack
+    sideLength = 500
     rows = 20
-    win = pygame.display.set_mode((width, width))
+    win = pygame.display.set_mode((sideLength, sideLength))
     s = snake((255,0,0), (10,10))
     snack = cube(randomSnack(rows, s), color=(112,128,144))
     flag = True
