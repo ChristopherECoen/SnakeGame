@@ -176,6 +176,7 @@ def main():
     sideLength = 500
     rows = 20
     win = pygame.display.set_mode((sideLength, sideLength))
+    pygame.display.set_caption('Coen Snake Game')
     s = snake((255,0,0), (10,10))
     snack = cube(randomSnack(rows, s), color=(112,128,144))
     flag = True
