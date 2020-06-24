@@ -4,6 +4,7 @@ import pygame
 import tkinter as tk
 from tkinter import messagebox
 
+#Defines the cubes that makes up the grid, as well as... sorta, singling out the one that is a 'snack' and the ones that make up a snake - including its head.
 class cube(object):
     rows = 20
     sL = 500
@@ -13,7 +14,6 @@ class cube(object):
         self.dirny = 0
         self.color = color
 
-        
     def move(self, dirnx, dirny):
         self.dirnx = dirnx
         self.dirny = dirny
@@ -35,7 +35,7 @@ class cube(object):
         
 
 
-
+#Defins the snake object.
 class snake(object):
     body = []
     turns = {}
@@ -46,6 +46,7 @@ class snake(object):
         self.dirnx = 0
         self.dirny = 1
 
+    #Press directional keys to move the snake, it logs this.
     def move(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -88,7 +89,6 @@ class snake(object):
                 elif c.dirny == -1 and c.pos[1] <= 0: c.pos = (c.pos[0],c.rows-1)
                 else: c.move(c.dirnx,c.dirny)
         
-
     def reset(self, pos):
         self.head = cube(pos)
         self.body = []
@@ -97,11 +97,10 @@ class snake(object):
         self.dirnx = 0
         self.dirny = 1
 
-
+    #Enter the same coordinates as a cube/snack object, add length to snake
     def addCube(self):
         tail = self.body[-1]
         dx, dy = tail.dirnx, tail.dirny
-
         if dx == 1 and dy == 0:
             self.body.append(cube((tail.pos[0]-1,tail.pos[1])))
         elif dx == -1 and dy == 0:
@@ -110,11 +109,10 @@ class snake(object):
             self.body.append(cube((tail.pos[0],tail.pos[1]-1)))
         elif dx == 0 and dy == -1:
             self.body.append(cube((tail.pos[0],tail.pos[1]+1)))
-
         self.body[-1].dirnx = dx
         self.body[-1].dirny = dy
         
-
+    #Draw snake with number of cubes as in body array.
     def draw(self, surface):
         for i, c in enumerate(self.body):
             if i ==0:
@@ -122,20 +120,18 @@ class snake(object):
             else:
                 c.draw(surface)
 
-
+#Draw the grid that's between boxes by floor division to the nearest whole number. It then draws based on coordinates.
 def drawGrid(sL, rows, surface):
     sizeBtwn = sL // rows
-
     x = 0
     y = 0
     for l in range(rows):
         x = x + sizeBtwn
         y = y + sizeBtwn
-
         pygame.draw.line(surface, (255,255,255), (x,0),(x,sL))
         pygame.draw.line(surface, (255,255,255), (0,y),(sL,y))
         
-
+#Basically, keep drawing the game borad, over and over, as the player moves, new snacks are made, and the player loses and is reset to a new, random position.
 def redrawWindow(surface):
     global rows, sideLength, s, snack
     surface.fill((0,0,0))
@@ -144,11 +140,9 @@ def redrawWindow(surface):
     drawGrid(sideLength,rows, surface)
     pygame.display.update()
 
-
+#Defining the proccess by which a new 'snack' is deployed onto the field after the last one was eaten.
 def randomSnack(rows, item):
-
     positions = item.body
-
     while True:
         x = random.randrange(rows)
         y = random.randrange(rows)
@@ -156,10 +150,9 @@ def randomSnack(rows, item):
             continue
         else:
             break
-        
     return (x,y)
 
-
+#Defining the the content box that will display the losing message
 def message_box(subject, content):
     root = tk.Tk()
     root.attributes("-topmost", True)
@@ -172,33 +165,38 @@ def message_box(subject, content):
 
 
 def main():
+    #sideLength determines dimensions of window, rows determins number of... rows.
     global sideLength, rows, s, snack
     sideLength = 500
+    #width = 500
+    #height = 500
+    #Rows need to divide down evenly from sideLength, or it looks weird and the play doesn't work.
     rows = 20
+    #The Window is a pygame display set to x, y length and height
     win = pygame.display.set_mode((sideLength, sideLength))
     pygame.display.set_caption('Coen Snake Game')
+    #Snake is a thing, as is snack, and a flag is made the default that the system is based on.
+    #While it's true, the loop of - play game, lose, play game - will continue until the Close Tab button on the top rigth is clicked.
     s = snake((255,0,0), (10,10))
     snack = cube(randomSnack(rows, s), color=(112,128,144))
     flag = True
-
+    #Creates a clock for the game to operate on.
     clock = pygame.time.Clock()
-    
     while flag:
+        #Game is on a delay, based on the clock, moving at 8FPS, the snake moves.
         pygame.time.delay(50)
         clock.tick(8)
         s.move()
+        #Snake moves ont cube, gets additional cube to its length, cube is added to random place on surface.
         if s.body[0].pos == snack.pos:
             s.addCube()
             snack = cube(randomSnack(rows, s), color=(112,128,144))
-
+        #Snake moves onto a space that contains a portion of its body, it loses. The score is displayed in a consol that was opened at the start.
         for x in range(len(s.body)):
             if s.body[x].pos in list(map(lambda z:z.pos,s.body[x+1:])):
                 print('Score: ', len(s.body))
                 message_box('You Lost!', 'Play again...')
                 s.reset((10,10))
                 break
-
-            
         redrawWindow(win)
-
 main()
